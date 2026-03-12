@@ -76,6 +76,7 @@ dmypy.json
 .vscode/
 .idea/
 .claude/
+INSTRUCTIONS.MD
 *.swp
 *.swo
 *~

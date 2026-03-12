@@ -1,0 +1,43 @@
+# Files and directories excluded from Docker image builds
+# Keep images lean — exclude everything not needed at runtime
+
+# Version control
+.git/
+.github/
+
+# Tests and evaluations (not needed at runtime)
+tests/
+evaluations/
+
+# Documentation
+*.md
+docs/
+
+# Local environment files (injected via --env-file at runtime)
+.env*
+
+# Python caches
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+
+# Local model files (bind-mounted from host, not baked into image)
+models/
+data/
+
+# Compose files (not needed inside container)
+docker-compose*.yml
+
+# Developer tooling
+Makefile
+scripts/
+config/
+
+# IDE
+.vscode/
+.idea/

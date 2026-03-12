@@ -1,0 +1,43 @@
+# =============================================================================
+# PyRIT Scorer Sidecar — HuggingFace Harm Classifier
+#
+# Lightweight REST scoring service wrapping HuggingFace text classifiers.
+# Used by pyrit_configure_classifier_scorer as the scoring backend.
+#
+# Exposed endpoint: POST /score
+# Request:  {"text": "...", "categories": ["toxic", "threat"]}
+# Response: {"score": 0.82, "label": "toxic", "categories": [...], "scores": {...}}
+#
+# Default model: unitary/toxic-bert (downloads from HuggingFace on first run)
+# Override with: SCORER_MODEL_NAME env var
+# =============================================================================
+
+FROM python:3.11-slim
+
+# Layer 1: System dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        gcc \
+        libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Layer 2: Python dependencies
+COPY docker/scorer_requirements.txt /tmp/scorer_requirements.txt
+RUN pip install --no-cache-dir -r /tmp/scorer_requirements.txt
+
+# Layer 3: Scorer application
+WORKDIR /app
+COPY docker/scorer_app.py /app/scorer_app.py
+
+# Run as non-root user
+RUN useradd --uid 1001 --no-create-home --shell /bin/false scorer
+USER scorer
+
+EXPOSE 8080
+
+ENV SCORER_MODEL_NAME=unitary/toxic-bert
+ENV SCORER_PORT=8080
+ENV SCORER_HOST=0.0.0.0
+ENV HF_HOME=/tmp/hf_cache
+
+CMD ["python", "-u", "scorer_app.py"]

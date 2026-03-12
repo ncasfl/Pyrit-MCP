@@ -1,0 +1,266 @@
+{
+  "schema_version": "1.0",
+  "tiers": [
+    {
+      "tier_id": 1,
+      "label": "Tier 1 — 8-16 GB RAM",
+      "ram_min_gb": 8,
+      "ram_max_gb": 16,
+      "compose_profile": "local-llm",
+      "attacker": {
+        "model_id": "dolphin-mistral-7b",
+        "quant_id": "Q4_K_M",
+        "backend": "ollama",
+        "ram_gb": 4.4,
+        "ollama_num_parallel": 1,
+        "ollama_max_loaded_models": 1,
+        "ollama_flash_attention": false,
+        "ollama_kv_cache_type": "q8_0",
+        "ollama_num_threads": 4,
+        "ollama_runner_numctx": 2048
+      },
+      "scorer": {
+        "model_id": "substring",
+        "backend": "substring",
+        "ram_gb": 0
+      },
+      "fallback_attacker": {
+        "model_id": "tinydolphin-1.1b",
+        "quant_id": "Q4_K_M",
+        "backend": "ollama",
+        "ram_gb": 0.7
+      },
+      "capabilities": [
+        "prompt_sending_orchestrator",
+        "dataset_attacks",
+        "substring_scoring"
+      ],
+      "limitations": [
+        "crescendo_not_viable",
+        "pair_not_viable",
+        "llm_scoring_not_viable"
+      ],
+      "notes": "Basic prompt injection and dataset attack testing. Substring scorer only."
+    },
+    {
+      "tier_id": 2,
+      "label": "Tier 2 — 17-31 GB RAM",
+      "ram_min_gb": 17,
+      "ram_max_gb": 31,
+      "compose_profile": "local-llm",
+      "attacker": {
+        "model_id": "dolphin-mixtral-8x7b",
+        "quant_id": "Q4_K_M",
+        "backend": "ollama",
+        "ram_gb": 26,
+        "ollama_num_parallel": 1,
+        "ollama_max_loaded_models": 1,
+        "ollama_flash_attention": false,
+        "ollama_kv_cache_type": "q8_0",
+        "ollama_num_threads": 8,
+        "ollama_runner_numctx": 4096
+      },
+      "scorer": {
+        "model_id": "toxic-bert-classifier",
+        "backend": "classifier",
+        "ram_gb": 1
+      },
+      "capabilities": [
+        "prompt_sending_orchestrator",
+        "dataset_attacks",
+        "basic_crescendo",
+        "substring_scoring",
+        "classifier_scoring"
+      ],
+      "limitations": [
+        "pair_quality_limited",
+        "llm_scoring_not_viable_locally"
+      ],
+      "notes": "Most single-turn orchestrators viable. Basic Crescendo works with quality tradeoffs."
+    },
+    {
+      "tier_id": 3,
+      "label": "Tier 3 — 32-63 GB RAM",
+      "ram_min_gb": 32,
+      "ram_max_gb": 63,
+      "compose_profile": "dual-ollama",
+      "attacker": {
+        "model_id": "dolphin-mixtral-8x22b",
+        "quant_id": "Q4_K_M",
+        "backend": "ollama",
+        "ram_gb": 48,
+        "ollama_num_parallel": 2,
+        "ollama_max_loaded_models": 1,
+        "ollama_flash_attention": true,
+        "ollama_kv_cache_type": "f16",
+        "ollama_num_threads": 16,
+        "ollama_runner_numctx": 8192
+      },
+      "scorer": {
+        "model_id": "nous-hermes2-11b",
+        "quant_id": "Q4_K_M",
+        "backend": "ollama",
+        "ram_gb": 7,
+        "ollama_num_threads": 8,
+        "ollama_runner_numctx": 4096
+      },
+      "capabilities": [
+        "all_orchestrators",
+        "crescendo",
+        "pair",
+        "llm_scoring_local",
+        "dual_instance"
+      ],
+      "notes": "Full orchestrator suite. Dual-instance attacker and scorer. Professional engagement capable."
+    },
+    {
+      "tier_id": 4,
+      "label": "Tier 4 — 64-127 GB RAM",
+      "ram_min_gb": 64,
+      "ram_max_gb": 127,
+      "compose_profile": "dual-ollama",
+      "attacker": {
+        "model_id": "dolphin-mixtral-8x22b",
+        "quant_id": "Q6_K",
+        "backend": "ollama",
+        "ram_gb": 58,
+        "ollama_num_parallel": 2,
+        "ollama_max_loaded_models": 2,
+        "ollama_flash_attention": true,
+        "ollama_kv_cache_type": "f16",
+        "ollama_num_threads": 32,
+        "ollama_runner_numctx": 16384
+      },
+      "attacker_high_ram": {
+        "model_id": "llama3.1-405b",
+        "quant_id": "Q2_K",
+        "backend": "ollama",
+        "ram_gb": 100,
+        "warning": "Q2_K quality tradeoff is significant; only viable if RAM >= 100GB within this tier"
+      },
+      "scorer": {
+        "model_id": "llama3.1-70b",
+        "quant_id": "Q4_K_M",
+        "backend": "ollama",
+        "ram_gb": 40,
+        "ollama_num_threads": 16,
+        "ollama_runner_numctx": 8192
+      },
+      "capabilities": [
+        "all_orchestrators",
+        "tree_of_attacks",
+        "high_quality_crescendo",
+        "high_quality_pair",
+        "high_quality_llm_scoring"
+      ],
+      "notes": "High-quality multi-turn attacks. Tree-of-Attacks viable. Suitable for most professional engagements."
+    },
+    {
+      "tier_id": 5,
+      "label": "Tier 5 — 128-255 GB RAM",
+      "ram_min_gb": 128,
+      "ram_max_gb": 255,
+      "compose_profile": "full-llamacpp",
+      "attacker": {
+        "model_id": "llama3.1-405b",
+        "quant_id": "Q4_K_M",
+        "backend": "llamacpp",
+        "ram_gb": 220,
+        "llamacpp_n_threads": 32,
+        "llamacpp_ctx_size": 32768,
+        "llamacpp_batch_size": 1024,
+        "llamacpp_n_parallel": 4,
+        "llamacpp_mlock": true,
+        "llamacpp_mmap": true,
+        "llamacpp_numa": ""
+      },
+      "scorer": {
+        "model_id": "llama3.1-70b",
+        "quant_id": "Q8_0",
+        "backend": "ollama",
+        "ram_gb": 70,
+        "ollama_num_threads": 16,
+        "ollama_runner_numctx": 16384
+      },
+      "capabilities": [
+        "all_orchestrators",
+        "near_frontier_attack_quality",
+        "full_llm_scoring"
+      ],
+      "notes": "Near-frontier attack quality. Suitable for high-value AI application testing."
+    },
+    {
+      "tier_id": 6,
+      "label": "Tier 6 — 256-511 GB RAM",
+      "ram_min_gb": 256,
+      "ram_max_gb": 511,
+      "compose_profile": "full-llamacpp",
+      "attacker": {
+        "model_id": "llama3.1-405b",
+        "quant_id": "Q5_K_M",
+        "backend": "llamacpp",
+        "ram_gb": 265,
+        "llamacpp_n_threads": 64,
+        "llamacpp_ctx_size": 32768,
+        "llamacpp_batch_size": 2048,
+        "llamacpp_n_parallel": 4,
+        "llamacpp_mlock": true,
+        "llamacpp_mmap": true,
+        "llamacpp_numa": "distribute"
+      },
+      "scorer": {
+        "model_id": "llama3.1-70b",
+        "quant_id": "Q8_0",
+        "backend": "ollama",
+        "ram_gb": 70,
+        "ollama_num_threads": 32,
+        "ollama_runner_numctx": 32768
+      },
+      "capabilities": [
+        "all_orchestrators",
+        "frontier_adjacent_quality",
+        "full_llm_scoring",
+        "dual_socket_numa_optimized"
+      ],
+      "notes": "Frontier-adjacent open-weight performance. Attacks approach GPT-4 quality with no content filtering."
+    },
+    {
+      "tier_id": 7,
+      "label": "Tier 7 — 512 GB+ RAM",
+      "ram_min_gb": 512,
+      "ram_max_gb": 99999,
+      "compose_profile": "full-llamacpp",
+      "attacker": {
+        "model_id": "llama3.1-405b",
+        "quant_id": "Q8_0",
+        "backend": "llamacpp",
+        "ram_gb": 400,
+        "llamacpp_n_threads": 64,
+        "llamacpp_ctx_size": 32768,
+        "llamacpp_batch_size": 2048,
+        "llamacpp_n_parallel": 8,
+        "llamacpp_mlock": true,
+        "llamacpp_mmap": true,
+        "llamacpp_numa": "distribute"
+      },
+      "scorer": {
+        "model_id": "llama3.1-70b",
+        "quant_id": "FP16",
+        "backend": "ollama",
+        "ram_gb": 140,
+        "ollama_num_threads": 64,
+        "ollama_runner_numctx": 32768,
+        "ollama_flash_attention": true,
+        "ollama_kv_cache_type": "f16"
+      },
+      "capabilities": [
+        "all_orchestrators",
+        "professional_ai_security_research",
+        "full_llm_scoring",
+        "dual_socket_numa_optimized",
+        "ram_headroom_for_third_model"
+      ],
+      "notes": "Professional AI security research grade. 405B Q8_0 exceeds most commercial red-team platforms. ~228GB RAM headroom at 768GB for a third specialized model."
+    }
+  ]
+}

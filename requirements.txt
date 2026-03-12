@@ -1,0 +1,29 @@
+# Production dependencies — floor-range pinned
+# Run: pip install -r requirements.txt
+
+# MCP framework
+mcp>=1.0.0
+
+# Core red-team framework
+pyrit>=0.5.0
+
+# Database
+duckdb>=0.10.0
+
+# Validation
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# Configuration
+python-dotenv>=1.0.0
+
+# HTTP client (async)
+httpx>=0.27.0
+
+# LLM provider SDKs
+openai>=1.40.0
+azure-ai-inference>=1.0.0b4
+azure-identity>=1.17.0
+
+# Model downloads
+huggingface-hub>=0.24.0

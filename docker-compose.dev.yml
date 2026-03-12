@@ -1,0 +1,44 @@
+# =============================================================================
+# PyRIT MCP Server — Development Compose Override
+#
+# Extends docker-compose.yml with development-specific settings:
+#   - Bind-mounts source code for hot reload (no rebuilds needed)
+#   - Uses Dockerfile.dev instead of production Dockerfile
+#   - Sets PYRIT_SANDBOX_MODE=true (no real attacks fired during dev)
+#   - Sets PYRIT_LOG_LEVEL=DEBUG
+#   - Exposes debugpy port 5678
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+#   make up-dev
+# =============================================================================
+
+services:
+  pyrit-mcp:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    # Override the production image tag — dev image is local only
+    image: pyrit-mcp:dev
+    environment:
+      PYRIT_LOG_LEVEL: DEBUG
+      PYRIT_SANDBOX_MODE: "true"
+    volumes:
+      # Bind-mount source code over the image copy — hot reload without rebuild
+      - ./pyrit_mcp:/app/pyrit_mcp:ro
+      # Bind-mount tests so pytest can run inside container
+      - ./tests:/app/tests:ro
+      # Persist dev DB separately from production data
+      - pyrit-db-dev:/data
+    ports:
+      # debugpy remote debugging
+      - "5678:5678"
+    # Override restart policy — dev containers should not auto-restart
+    restart: "no"
+
+# ---------------------------------------------------------------------------
+# Named volumes (dev-specific)
+# ---------------------------------------------------------------------------
+volumes:
+  pyrit-db-dev:
+    driver: local

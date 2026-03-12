@@ -1,0 +1,239 @@
+{
+  "schema_version": "1.0",
+  "models": [
+    {
+      "id": "dolphin-mistral-7b",
+      "family": "mistral",
+      "params_b": 7,
+      "uncensored": true,
+      "ollama_name": "dolphin-mistral",
+      "hf_repo": "cognitivecomputations/dolphin-2.1-mistral-7b-GGUF",
+      "recommended_role": "attacker",
+      "min_ram_gb": 4,
+      "optimal_ram_gb": 6,
+      "notes": "Dolphin series removes safety training; excellent instruction following; ideal Tier 1 attacker",
+      "quantizations": [
+        {
+          "quant_id": "Q4_K_M",
+          "ram_gb": 4.4,
+          "quality_score": 7,
+          "gguf_filename": "dolphin-2.1-mistral-7b.Q4_K_M.gguf"
+        },
+        {
+          "quant_id": "Q5_K_M",
+          "ram_gb": 5.1,
+          "quality_score": 8,
+          "gguf_filename": "dolphin-2.1-mistral-7b.Q5_K_M.gguf"
+        },
+        {
+          "quant_id": "Q8_0",
+          "ram_gb": 7.7,
+          "quality_score": 9,
+          "gguf_filename": "dolphin-2.1-mistral-7b.Q8_0.gguf"
+        }
+      ]
+    },
+    {
+      "id": "tinydolphin-1.1b",
+      "family": "phi",
+      "params_b": 1.1,
+      "uncensored": true,
+      "ollama_name": "tinydolphin",
+      "hf_repo": "cognitivecomputations/TinyDolphin-2.8-1.1b-GGUF",
+      "recommended_role": "attacker",
+      "min_ram_gb": 1,
+      "optimal_ram_gb": 1,
+      "notes": "Emergency fallback for extremely constrained systems; quality severely limited",
+      "quantizations": [
+        {
+          "quant_id": "Q4_K_M",
+          "ram_gb": 0.7,
+          "quality_score": 3,
+          "gguf_filename": "tinydolphin-2.8-1.1b.Q4_K_M.gguf"
+        }
+      ]
+    },
+    {
+      "id": "wizard-vicuna-uncensored-13b",
+      "family": "llama",
+      "params_b": 13,
+      "uncensored": true,
+      "ollama_name": "wizard-vicuna-uncensored",
+      "hf_repo": "TheBloke/Wizard-Vicuna-13B-Uncensored-GGUF",
+      "recommended_role": "attacker",
+      "min_ram_gb": 8,
+      "optimal_ram_gb": 10,
+      "notes": "Purpose-built for unconstrained output generation; solid Tier 1-2 attacker",
+      "quantizations": [
+        {
+          "quant_id": "Q4_K_M",
+          "ram_gb": 8.4,
+          "quality_score": 6,
+          "gguf_filename": "Wizard-Vicuna-13B-Uncensored.Q4_K_M.gguf"
+        }
+      ]
+    },
+    {
+      "id": "nous-hermes2-11b",
+      "family": "mistral",
+      "params_b": 11,
+      "uncensored": true,
+      "ollama_name": "nous-hermes2",
+      "hf_repo": "NousResearch/Nous-Hermes-2-Mistral-7B-DPO-GGUF",
+      "recommended_role": "both",
+      "min_ram_gb": 7,
+      "optimal_ram_gb": 9,
+      "notes": "Strong reasoning, minimal refusals; works well as both attacker and scorer at Tier 2",
+      "quantizations": [
+        {
+          "quant_id": "Q4_K_M",
+          "ram_gb": 7.3,
+          "quality_score": 7,
+          "gguf_filename": "Nous-Hermes-2-Mistral-7B-DPO.Q4_K_M.gguf"
+        }
+      ]
+    },
+    {
+      "id": "dolphin-mixtral-8x7b",
+      "family": "mixtral",
+      "params_b": 47,
+      "uncensored": true,
+      "ollama_name": "dolphin-mixtral:8x7b",
+      "hf_repo": "cognitivecomputations/dolphin-2.7-mixtral-8x7b-GGUF",
+      "recommended_role": "attacker",
+      "min_ram_gb": 24,
+      "optimal_ram_gb": 28,
+      "notes": "Best uncensored MoE attacker for 24-32GB RAM tier; excellent quality/size ratio",
+      "quantizations": [
+        {
+          "quant_id": "Q4_K_M",
+          "ram_gb": 26,
+          "quality_score": 8,
+          "gguf_filename": "dolphin-2.7-mixtral-8x7b.Q4_K_M.gguf"
+        }
+      ]
+    },
+    {
+      "id": "nous-hermes-2-mixtral-8x7b",
+      "family": "mixtral",
+      "params_b": 47,
+      "uncensored": true,
+      "ollama_name": "nous-hermes2-mixtral-8x7b",
+      "hf_repo": "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO-GGUF",
+      "recommended_role": "attacker",
+      "min_ram_gb": 24,
+      "optimal_ram_gb": 28,
+      "notes": "Fast, good quality, minimal refusals; alternative Tier 2 attacker",
+      "quantizations": [
+        {
+          "quant_id": "Q4_K_M",
+          "ram_gb": 26,
+          "quality_score": 8,
+          "gguf_filename": "Nous-Hermes-2-Mixtral-8x7B-DPO.Q4_K_M.gguf"
+        }
+      ]
+    },
+    {
+      "id": "dolphin-mixtral-8x22b",
+      "family": "mixtral",
+      "params_b": 141,
+      "uncensored": true,
+      "ollama_name": "dolphin-mixtral:8x22b",
+      "hf_repo": "cognitivecomputations/dolphin-2.9-mixtral-8x22b-GGUF",
+      "recommended_role": "attacker",
+      "min_ram_gb": 48,
+      "optimal_ram_gb": 58,
+      "notes": "Flagship uncensored MoE; excellent attacker quality for Tier 3/4; best uncensored model below 405B",
+      "quantizations": [
+        {
+          "quant_id": "Q4_K_M",
+          "ram_gb": 48,
+          "quality_score": 8,
+          "gguf_filename": "dolphin-2.9-mixtral-8x22b.Q4_K_M.gguf"
+        },
+        {
+          "quant_id": "Q6_K",
+          "ram_gb": 58,
+          "quality_score": 9,
+          "gguf_filename": "dolphin-2.9-mixtral-8x22b.Q6_K.gguf"
+        }
+      ]
+    },
+    {
+      "id": "llama3.1-70b",
+      "family": "llama3",
+      "params_b": 70,
+      "uncensored": false,
+      "ollama_name": "llama3.1:70b",
+      "hf_repo": "meta-llama/Meta-Llama-3.1-70B-Instruct-GGUF",
+      "recommended_role": "scorer",
+      "min_ram_gb": 40,
+      "optimal_ram_gb": 70,
+      "notes": "Ideal scorer at Tier 3+; high quality judgment without content filtering limitations",
+      "quantizations": [
+        {
+          "quant_id": "Q4_K_M",
+          "ram_gb": 40,
+          "quality_score": 8,
+          "gguf_filename": "Meta-Llama-3.1-70B-Instruct-Q4_K_M.gguf"
+        },
+        {
+          "quant_id": "Q6_K",
+          "ram_gb": 48,
+          "quality_score": 9,
+          "gguf_filename": "Meta-Llama-3.1-70B-Instruct-Q6_K.gguf"
+        },
+        {
+          "quant_id": "Q8_0",
+          "ram_gb": 70,
+          "quality_score": 10,
+          "gguf_filename": "Meta-Llama-3.1-70B-Instruct-Q8_0.gguf"
+        },
+        {
+          "quant_id": "FP16",
+          "ram_gb": 140,
+          "quality_score": 10,
+          "gguf_filename": "Meta-Llama-3.1-70B-Instruct-F16.gguf"
+        }
+      ]
+    },
+    {
+      "id": "llama3.1-405b",
+      "family": "llama3",
+      "params_b": 405,
+      "uncensored": false,
+      "ollama_name": "llama3.1:405b",
+      "hf_repo": "meta-llama/Meta-Llama-3.1-405B-Instruct-GGUF",
+      "recommended_role": "attacker",
+      "min_ram_gb": 100,
+      "optimal_ram_gb": 400,
+      "notes": "Best open-weight model; practically uncensored at Q5+ quantizations; flagship choice for Tier 5/6/7",
+      "quantizations": [
+        {
+          "quant_id": "Q2_K",
+          "ram_gb": 100,
+          "quality_score": 5,
+          "gguf_filename": "Meta-Llama-3.1-405B-Instruct-Q2_K.gguf"
+        },
+        {
+          "quant_id": "Q4_K_M",
+          "ram_gb": 220,
+          "quality_score": 7,
+          "gguf_filename": "Meta-Llama-3.1-405B-Instruct-Q4_K_M.gguf"
+        },
+        {
+          "quant_id": "Q5_K_M",
+          "ram_gb": 265,
+          "quality_score": 8,
+          "gguf_filename": "Meta-Llama-3.1-405B-Instruct-Q5_K_M.gguf"
+        },
+        {
+          "quant_id": "Q8_0",
+          "ram_gb": 400,
+          "quality_score": 9,
+          "gguf_filename": "Meta-Llama-3.1-405B-Instruct-Q8_0.gguf"
+        }
+      ]
+    }
+  ]
+}

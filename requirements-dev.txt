@@ -1,0 +1,27 @@
+# Development dependencies — floor-range pinned
+# Run: pip install -r requirements.txt -r requirements-dev.txt
+
+# Testing
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+pytest-cov>=5.0.0
+pytest-mock>=3.14.0
+
+# Code quality
+ruff>=0.5.0
+mypy>=1.10.0
+
+# Type stubs
+types-python-dotenv>=1.0.0
+
+# Interactive development
+ipython>=8.25.0
+
+# File watching for hot reload
+watchdog>=4.0.0
+
+# Pre-commit framework
+pre-commit>=3.7.0
+
+# Secret detection
+detect-secrets>=1.5.0

@@ -1,0 +1,334 @@
+# =============================================================================
+# PyRIT MCP Server — Docker Compose
+#
+# Usage:
+#   docker compose up                           (cloud backend, no local LLM)
+#   docker compose --profile local-llm up       (Ollama CPU inference)
+#   docker compose --profile local-llm-gpu up   (Ollama NVIDIA GPU)
+#   docker compose --profile local-llm-amd up   (Ollama AMD ROCm)
+#   docker compose --profile dual-ollama up     (independent attacker + scorer)
+#   docker compose --profile full-llamacpp up   (llama.cpp attacker, Tier 5/6/7)
+#   docker compose --profile full up            (fully offline CPU stack)
+#
+# All secrets come from --env-file at runtime. Never hardcode keys here.
+# =============================================================================
+
+name: pyrit-mcp
+
+# ---------------------------------------------------------------------------
+# Base service: PyRIT MCP server
+# Included in every profile. External LLM backends are configured via .env.
+# ---------------------------------------------------------------------------
+services:
+  pyrit-mcp:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: ghcr.io/ncasfl/pyrit-mcp:latest
+    stdin_open: true     # Required: keeps stdin open for MCP stdio protocol
+    tty: false           # CRITICAL: NO pseudo-TTY — breaks MCP stdio transport
+    env_file:
+      - path: ../.env
+        required: false
+      - path: ../.env.detected
+        required: false
+    environment:
+      PYRIT_DB_PATH: /data/pyrit.db
+      PYRIT_LOG_LEVEL: ${PYRIT_LOG_LEVEL:-INFO}
+      PYRIT_SANDBOX_MODE: ${PYRIT_SANDBOX_MODE:-false}
+      PYRIT_DEFAULT_RPS: ${PYRIT_DEFAULT_RPS:-2}
+      PYRIT_DEFAULT_MAX_REQUESTS: ${PYRIT_DEFAULT_MAX_REQUESTS:-100}
+      ATTACKER_BACKEND: ${ATTACKER_BACKEND:-ollama}
+      ATTACKER_BASE_URL: ${ATTACKER_BASE_URL:-http://ollama:11434}
+      ATTACKER_MODEL: ${ATTACKER_MODEL:-dolphin-mistral}
+      ATTACKER_TEMPERATURE: ${ATTACKER_TEMPERATURE:-1.0}
+      ATTACKER_MAX_TOKENS: ${ATTACKER_MAX_TOKENS:-2048}
+      ATTACKER_TIMEOUT: ${ATTACKER_TIMEOUT:-60}
+      ATTACKER_QUANTIZATION: ${ATTACKER_QUANTIZATION:-}
+      ATTACKER_API_KEY_ENV: ${ATTACKER_API_KEY_ENV:-}
+      SCORER_BACKEND: ${SCORER_BACKEND:-substring}
+      SCORER_BASE_URL: ${SCORER_BASE_URL:-}
+      SCORER_MODEL: ${SCORER_MODEL:-}
+      SCORER_TEMPERATURE: ${SCORER_TEMPERATURE:-0.0}
+      SCORER_API_KEY_ENV: ${SCORER_API_KEY_ENV:-}
+    volumes:
+      - pyrit-db:/data
+      - ${DATASETS_PATH:-./data/datasets}:/datasets:ro
+      - ${MODELS_PATH:-./models}:/models:ro
+    networks:
+      - pyrit-internal
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Profile: local-llm
+  # CPU-only Ollama inference. No GPU required.
+  # ---------------------------------------------------------------------------
+  ollama:
+    profiles: [local-llm, dual-ollama, full]
+    image: ollama/ollama:latest
+    volumes:
+      - ollama-models:/root/.ollama
+    environment:
+      OLLAMA_NUM_PARALLEL: ${OLLAMA_NUM_PARALLEL:-1}
+      OLLAMA_MAX_LOADED_MODELS: ${OLLAMA_MAX_LOADED_MODELS:-1}
+      OLLAMA_FLASH_ATTENTION: ${OLLAMA_FLASH_ATTENTION:-false}
+      OLLAMA_KV_CACHE_TYPE: ${OLLAMA_KV_CACHE_TYPE:-q8_0}
+      OLLAMA_NUM_THREADS: ${OLLAMA_NUM_THREADS:-4}
+      OLLAMA_RUNNER_NUMCTX: ${OLLAMA_RUNNER_NUMCTX:-2048}
+    networks:
+      - pyrit-internal
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+
+  # One-shot init container: pulls the configured attacker model into Ollama
+  ollama-init:
+    profiles: [local-llm, full]
+    image: ollama/ollama:latest
+    volumes:
+      - ollama-models:/root/.ollama
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    entrypoint: ["ollama", "pull"]
+    command: ["${OLLAMA_MODEL:-dolphin-mistral}"]
+    depends_on:
+      ollama:
+        condition: service_healthy
+    networks:
+      - pyrit-internal
+    restart: "no"
+
+  # ---------------------------------------------------------------------------
+  # Profile: local-llm-gpu (NVIDIA CUDA)
+  # Requires: nvidia-container-toolkit installed on host
+  # Install: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html
+  # ---------------------------------------------------------------------------
+  ollama-gpu:
+    profiles: [local-llm-gpu, full-gpu]
+    image: ollama/ollama:latest
+    volumes:
+      - ollama-models:/root/.ollama
+    environment:
+      OLLAMA_NUM_PARALLEL: ${OLLAMA_NUM_PARALLEL:-2}
+      OLLAMA_MAX_LOADED_MODELS: ${OLLAMA_MAX_LOADED_MODELS:-1}
+      OLLAMA_FLASH_ATTENTION: ${OLLAMA_FLASH_ATTENTION:-true}
+      OLLAMA_KV_CACHE_TYPE: ${OLLAMA_KV_CACHE_TYPE:-f16}
+      NVIDIA_VISIBLE_DEVICES: ${CUDA_VISIBLE_DEVICES:-all}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    networks:
+      - pyrit-internal
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+
+  ollama-gpu-init:
+    profiles: [local-llm-gpu, full-gpu]
+    image: ollama/ollama:latest
+    volumes:
+      - ollama-models:/root/.ollama
+    environment:
+      OLLAMA_HOST: http://ollama-gpu:11434
+    entrypoint: ["ollama", "pull"]
+    command: ["${OLLAMA_MODEL:-dolphin-mistral}"]
+    depends_on:
+      ollama-gpu:
+        condition: service_healthy
+    networks:
+      - pyrit-internal
+    restart: "no"
+
+  # ---------------------------------------------------------------------------
+  # Profile: local-llm-amd (AMD ROCm)
+  # Requires: ROCm drivers installed. Set HSA_OVERRIDE_GFX_VERSION if needed.
+  # ---------------------------------------------------------------------------
+  ollama-amd:
+    profiles: [local-llm-amd]
+    image: ollama/ollama:rocm
+    volumes:
+      - ollama-models:/root/.ollama
+    devices:
+      - /dev/kfd
+      - /dev/dri
+    environment:
+      OLLAMA_NUM_PARALLEL: ${OLLAMA_NUM_PARALLEL:-2}
+      OLLAMA_FLASH_ATTENTION: ${OLLAMA_FLASH_ATTENTION:-true}
+      HSA_OVERRIDE_GFX_VERSION: ${HSA_OVERRIDE_GFX_VERSION:-}
+    networks:
+      - pyrit-internal
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+
+  # ---------------------------------------------------------------------------
+  # Profile: dual-ollama
+  # Two independent Ollama instances: one for the attacker, one for the scorer.
+  # Allows running different models at different quantization levels simultaneously.
+  # Attacker runs on port 11434, scorer on port 11435.
+  # ---------------------------------------------------------------------------
+  ollama-scorer:
+    profiles: [dual-ollama]
+    image: ollama/ollama:latest
+    volumes:
+      - ollama-scorer-models:/root/.ollama
+    ports:
+      - "11435:11434"  # Expose on different host port to avoid conflict
+    environment:
+      OLLAMA_NUM_PARALLEL: ${OLLAMA_SCORER_NUM_PARALLEL:-1}
+      OLLAMA_MAX_LOADED_MODELS: 1
+      OLLAMA_FLASH_ATTENTION: ${OLLAMA_FLASH_ATTENTION:-true}
+      OLLAMA_KV_CACHE_TYPE: ${OLLAMA_KV_CACHE_TYPE:-f16}
+      OLLAMA_NUM_THREADS: ${OLLAMA_SCORER_NUM_THREADS:-8}
+    networks:
+      - pyrit-internal
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+
+  ollama-scorer-init:
+    profiles: [dual-ollama]
+    image: ollama/ollama:latest
+    volumes:
+      - ollama-scorer-models:/root/.ollama
+    environment:
+      OLLAMA_HOST: http://ollama-scorer:11434
+    entrypoint: ["ollama", "pull"]
+    command: ["${OLLAMA_SCORER_MODEL:-nous-hermes2}"]
+    depends_on:
+      ollama-scorer:
+        condition: service_healthy
+    networks:
+      - pyrit-internal
+    restart: "no"
+
+  # ---------------------------------------------------------------------------
+  # Profile: full-llamacpp
+  # llama.cpp server as attacker (Tier 5/6/7 high-RAM machines).
+  # Ollama as scorer. GGUF model files bind-mounted from host ./models/ directory.
+  #
+  # On dual-socket machines, set LLAMACPP_NUMA=distribute in .env for 2-3x throughput.
+  # Run 'make detect' on the host to auto-configure NUMA, thread counts, and mlock.
+  # ---------------------------------------------------------------------------
+  llamacpp-attacker:
+    profiles: [full-llamacpp]
+    image: ghcr.io/ggerganov/llama.cpp:server
+    volumes:
+      - ../models:/models:ro
+    command: >
+      --model ${LLAMACPP_MODEL_PATH:-/models/llama3.1-405b-Q8_0.gguf}
+      --host 0.0.0.0
+      --port ${LLAMACPP_PORT:-8080}
+      --threads ${LLAMACPP_N_THREADS:-8}
+      --ctx-size ${LLAMACPP_CTX_SIZE:-32768}
+      --batch-size ${LLAMACPP_BATCH_SIZE:-512}
+      --parallel ${LLAMACPP_N_PARALLEL:-4}
+      --n-gpu-layers ${LLAMACPP_N_GPU_LAYERS:-0}
+      ${LLAMACPP_MLOCK:+--mlock}
+      ${LLAMACPP_MMAP:+--mmap}
+      ${LLAMACPP_NUMA:+--numa ${LLAMACPP_NUMA}}
+    networks:
+      - pyrit-internal
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+  ollama-scorer-llamacpp:
+    profiles: [full-llamacpp]
+    image: ollama/ollama:latest
+    volumes:
+      - ollama-scorer-models:/root/.ollama
+    environment:
+      OLLAMA_NUM_PARALLEL: ${OLLAMA_SCORER_NUM_PARALLEL:-2}
+      OLLAMA_FLASH_ATTENTION: ${OLLAMA_FLASH_ATTENTION:-true}
+      OLLAMA_KV_CACHE_TYPE: f16
+      OLLAMA_NUM_THREADS: ${OLLAMA_SCORER_NUM_THREADS:-32}
+    networks:
+      - pyrit-internal
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+
+  # ---------------------------------------------------------------------------
+  # Profile: local-scorer
+  # HuggingFace harm classifier sidecar. Exposes a REST scoring endpoint
+  # consumed by pyrit_configure_classifier_scorer.
+  #
+  # Default model: unitary/toxic-bert (auto-downloaded from HuggingFace on
+  # first run). Override with SCORER_MODEL_NAME env var in .env.
+  # Set HUGGINGFACE_TOKEN in .env for gated model access.
+  #
+  # Usage:
+  #   docker compose --profile local-scorer up
+  # ---------------------------------------------------------------------------
+  pyrit-scorer:
+    profiles: [local-scorer, full, full-gpu]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.scorer
+    environment:
+      SCORER_MODEL_NAME: ${SCORER_MODEL_NAME:-unitary/toxic-bert}
+      SCORER_PORT: "8080"
+      HF_HOME: /tmp/hf_cache
+      HUGGINGFACE_TOKEN: ${HUGGINGFACE_TOKEN:-}
+    networks:
+      - pyrit-internal
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8080/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+# ---------------------------------------------------------------------------
+# Named volumes
+# ---------------------------------------------------------------------------
+volumes:
+  pyrit-db:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PYRIT_DB_HOST_PATH:-./data}
+
+  ollama-models:
+    driver: local
+
+  ollama-scorer-models:
+    driver: local
+
+# ---------------------------------------------------------------------------
+# Internal network — services are NOT exposed to the host network by default
+# ---------------------------------------------------------------------------
+networks:
+  pyrit-internal:
+    driver: bridge

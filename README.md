@@ -38,6 +38,17 @@ all through a clean tool interface.
 
 ---
 
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [INSTALL.md](INSTALL.md) | Step-by-step installation guide — Python setup, VS Code (Claude Code & GitHub Copilot), Claude Desktop, Docker |
+| [USER_GUIDE.md](USER_GUIDE.md) | Comprehensive user guide — all 42 tools by domain, example prompts, workflows, and testing recommendations |
+| [CHANGELOG.md](CHANGELOG.md) | Release history and change log |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
+
+---
+
 ## The Dual-LLM Architecture
 
 PyRIT requires two LLM roles with opposing safety requirements:
@@ -359,4 +370,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for full contribution guidelines.
 
 ## License
 
-[MIT](LICENSE) — Copyright (c) 2026 ncasfl
+[MIT](LICENSE) — Copyright (c) 2026 Christopher Hohman

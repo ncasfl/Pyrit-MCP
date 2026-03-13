@@ -176,7 +176,7 @@ Values in `.env.local` override those in `.env`. This file is already included i
 | **Azure Entra (Azure AD)** | Token-based auth for Azure resources — no API key needed | Planned for v0.2.0 |
 
 Azure Entra authentication will eliminate the need to manage API keys for Azure-hosted models.
-See the [Roadmap](USER_GUIDE.md#roadmap) for details on upcoming features.
+See the [Roadmap](ROADMAP.md) for details on upcoming features.
 
 ---
 

@@ -21,6 +21,7 @@
 |----------|-------------|
 | **[INSTALL.md](INSTALL.md)** | Step-by-step installation guide — Python setup, VS Code (Claude Code & GitHub Copilot), Claude Desktop, Docker |
 | **[USER_GUIDE.md](USER_GUIDE.md)** | Comprehensive user guide — all 42 tools by domain, example prompts, workflows, and testing recommendations |
+| **[ROADMAP.md](ROADMAP.md)** | Planned features, v0.2.0 development status, and PyRIT coverage gaps |
 | [CHANGELOG.md](CHANGELOG.md) | Release history and change log |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
 

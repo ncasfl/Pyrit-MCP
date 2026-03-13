@@ -1420,37 +1420,9 @@ The MCP server currently supports API key authentication via environment variabl
 
 ## Roadmap
 
-### v0.2.0 — In Development (`dev` branch)
-
-The following features are planned for the next release and are being developed on the [`dev` branch](https://github.com/ncasfl/Pyrit-MCP/tree/dev):
-
-**Transport**
-- **SSE/HTTP transport** — Enable remote and shared server access beyond stdio. This allows team setups where multiple users connect to a single PyRIT MCP server instance, CI/CD pipeline integration, and deployment on remote infrastructure without requiring local installation.
-
-**New Attack Strategies**
-- Context Compliance Attack
-- Role Play Attack
-- Multi-Prompt Sending Attack (multi-target)
-
-**New Scorers**
-- Azure Content Safety scorer
-- Refusal scorer
-- Likert scale scorer
-- Persuasion scorer
-- Insecure code scorer
-
-**Authentication**
-- Azure Entra (Azure AD) token-based authentication
-- `.env.local` override support
-
-**Other**
-- Multimodal converter support (audio, image, video, file)
-- XPIA workflow tools
-- Azure SQL memory backend option
-
-> **Contributing:** See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get involved.
-> The `dev` branch is the integration branch for v0.2.0 work. Feature branches
-> should be created from `dev` and merged back via pull request.
+For the full roadmap — including v0.2.0 planned features (SSE/HTTP transport, new attacks,
+new scorers, Azure Entra auth, multimodal converters), future considerations, and
+workarounds for features not yet exposed — see **[ROADMAP.md](ROADMAP.md)**.
 
 ---
 

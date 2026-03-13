@@ -152,6 +152,32 @@ For production use, configure your attacker and scorer backends. See `.env.examp
 > **Security:** API keys are referenced by env var name (e.g., `ATTACKER_API_KEY_ENV=MY_KEY`),
 > never passed as raw values in tool parameters. This prevents keys from appearing in MCP conversation logs.
 
+### Local overrides with .env.local
+
+For personal settings that should not be committed to version control, create a `.env.local` file:
+
+```bash
+cp .env .env.local
+# Edit .env.local with your personal API keys and settings
+```
+
+Values in `.env.local` override those in `.env`. This file is already included in `.gitignore`.
+
+> **Note:** `.env.local` override support is a PyRIT native feature.
+> Full support in the MCP server is planned for v0.2.0 — currently the server
+> reads only from `.env` and system environment variables.
+
+### Authentication options
+
+| Method | Use Case | Status |
+|--------|----------|--------|
+| **API Key** (via env var) | OpenAI, Ollama, Groq, LM Studio | Supported |
+| **Azure API Key** | Azure OpenAI deployments | Supported |
+| **Azure Entra (Azure AD)** | Token-based auth for Azure resources — no API key needed | Planned for v0.2.0 |
+
+Azure Entra authentication will eliminate the need to manage API keys for Azure-hosted models.
+See the [Roadmap](USER_GUIDE.md#roadmap) for details on upcoming features.
+
 ---
 
 ## Step 4 — Verify the Server Starts

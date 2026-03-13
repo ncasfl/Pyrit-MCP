@@ -19,7 +19,9 @@ A comprehensive guide to all 42 tools across 7 domains for LLM-orchestrated AI r
 11. [End-to-End Workflow Examples](#end-to-end-workflow-examples)
 12. [Sandbox Mode](#sandbox-mode)
 13. [Security Model](#security-model)
-14. [Troubleshooting](#troubleshooting)
+14. [PyRIT Features Not Yet Exposed](#pyrit-features-not-yet-exposed)
+15. [Roadmap](#roadmap)
+16. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -1337,6 +1339,118 @@ This tool is designed for **authorized security testing** only:
 - Internal red-teaming of your own AI applications
 - Security research in controlled environments
 - CTF competitions and educational contexts
+
+---
+
+## PyRIT Features Not Yet Exposed
+
+The PyRIT MCP Server wraps the most commonly used PyRIT capabilities, but PyRIT itself is a large framework with additional features not yet available as MCP tools. This section documents what exists in PyRIT but is not currently exposed, so you know when to use PyRIT directly and what may appear in future releases.
+
+### Attack Strategies Not Yet Wrapped
+
+The following PyRIT attack executors exist but do not have corresponding MCP tools:
+
+| PyRIT Attack | Description | Why Not Included |
+|---|---|---|
+| **Chunked Request Attack** | Splits a harmful prompt across multiple turns so each individual message appears benign | Requires complex multi-message state management |
+| **Context Compliance Attack** | Establishes a permissive context before sending the payload | Planned for v0.2.0 |
+| **Many-Shot Jailbreak Attack** | Packs many Q&A examples into a single long prompt to prime the model | Requires very large context windows |
+| **Role Play Attack** | Instructs the target to adopt a character that would respond harmfully | Planned for v0.2.0 |
+| **Violent Durian Attack** | A specific multi-turn persuasion technique | Experimental in PyRIT |
+| **Red Teaming Attack** | Generic multi-turn red teaming with custom objectives | Partially covered by Crescendo/PAIR orchestrators |
+| **Multi-Prompt Sending Attack** | Sends prompts to multiple targets simultaneously | Planned for v0.2.0 |
+
+> **Workaround:** For attack strategies not yet wrapped, use PyRIT directly via Python scripts. Results can be imported into the MCP server using `pyrit_import_dataset_from_file` for scoring and reporting.
+
+### Multimodal Converters
+
+The MCP server currently exposes **text-to-text converters** only. PyRIT also supports:
+
+- **Audio converters** — Text-to-speech for audio-based prompt injection
+- **Image converters** — Text overlay on images, steganography, visual prompt injection
+- **Video converters** — Video-based adversarial content generation
+- **File converters** — Convert prompts to PDF, DOCX, or other document formats
+
+These require multimodal target support and are planned for a future release.
+
+### Additional Scorer Types
+
+PyRIT includes scorer types beyond what the MCP server currently exposes:
+
+| Scorer | Description | Status |
+|---|---|---|
+| **Azure Content Safety** | Uses Azure AI Content Safety API for harm detection | Requires Azure subscription; planned for v0.2.0 |
+| **Refusal Scorer** | Specifically detects when a target refuses to answer | Planned for v0.2.0 |
+| **Likert Scale Scorer** | Scores on a 1-5 scale instead of binary pass/fail | Planned for v0.2.0 |
+| **Human-in-the-Loop Scorer** | Pauses for manual human review | Not applicable to MCP automation flow |
+| **Persuasion Scorer** | Evaluates persuasion effectiveness across full conversations | Planned for v0.2.0 |
+| **Prompt Shield Scorer** | Uses Azure Prompt Shield for injection detection | Requires Azure subscription |
+| **Insecure Code Scorer** | Detects insecure code patterns in responses | Planned for v0.2.0 |
+
+### Advanced Memory Features
+
+PyRIT's memory system includes capabilities beyond the MCP server's DuckDB implementation:
+
+- **Azure SQL backend** — Enterprise-grade persistent storage for team environments
+- **Memory labels** — Tag and filter conversation entries with custom metadata
+- **Embedding search** — Semantic similarity search across stored interactions
+- **Schema diagram** — Full ER diagram of PyRIT's data model
+
+The MCP server uses DuckDB in-memory storage optimized for single-session workflows. For multi-session persistence across team environments, use PyRIT's Azure SQL backend directly.
+
+### XPIA (Cross-Domain Prompt Injection) Workflows
+
+PyRIT includes specialized workflows for testing cross-domain prompt injection attacks:
+
+- **Website XPIA** — Inject prompts via web content that a target AI system processes
+- **AI Recruiter XPIA** — Test AI-powered recruitment tools for prompt injection vulnerabilities
+
+These are highly specialized scenarios not yet exposed as MCP tools.
+
+### Authentication Methods
+
+PyRIT supports additional authentication methods beyond API keys:
+
+- **Azure Entra (Azure AD)** — Token-based authentication for Azure-hosted models, eliminates the need for API key management
+- **`.env.local` overrides** — Local environment file that overrides `.env` without being committed to git
+
+The MCP server currently supports API key authentication via environment variable references. Azure Entra support is planned for v0.2.0.
+
+---
+
+## Roadmap
+
+### v0.2.0 — In Development (`dev` branch)
+
+The following features are planned for the next release and are being developed on the [`dev` branch](https://github.com/ncasfl/Pyrit-MCP/tree/dev):
+
+**Transport**
+- **SSE/HTTP transport** — Enable remote and shared server access beyond stdio. This allows team setups where multiple users connect to a single PyRIT MCP server instance, CI/CD pipeline integration, and deployment on remote infrastructure without requiring local installation.
+
+**New Attack Strategies**
+- Context Compliance Attack
+- Role Play Attack
+- Multi-Prompt Sending Attack (multi-target)
+
+**New Scorers**
+- Azure Content Safety scorer
+- Refusal scorer
+- Likert scale scorer
+- Persuasion scorer
+- Insecure code scorer
+
+**Authentication**
+- Azure Entra (Azure AD) token-based authentication
+- `.env.local` override support
+
+**Other**
+- Multimodal converter support (audio, image, video, file)
+- XPIA workflow tools
+- Azure SQL memory backend option
+
+> **Contributing:** See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get involved.
+> The `dev` branch is the integration branch for v0.2.0 work. Feature branches
+> should be created from `dev` and merged back via pull request.
 
 ---
 

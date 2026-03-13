@@ -72,12 +72,12 @@ Claude (or any MCP-compatible LLM client) acts as the **test director**: choosin
 │  └── Credential safety (env var references only)    │
 ├─────────────────────────────────────────────────────┤
 │  Backends                    Targets                │
-│  ├── Ollama (local)          ├── OpenAI-compatible   │
-│  ├── OpenAI                  ├── Azure OpenAI        │
-│  ├── Azure OpenAI            ├── HTTP endpoints      │
-│  ├── Groq                    └── Custom APIs         │
-│  ├── LM Studio               │
-│  └── llama.cpp               │
+│  ├── Ollama (local)          ├── OpenAI-compatible  │
+│  ├── OpenAI                  ├── Azure OpenAI       │
+│  ├── Azure OpenAI            ├── HTTP endpoints     │
+│  ├── Groq                    └── Custom APIs        │
+│  ├── LM Studio                                      │
+│  └── llama.cpp                                      │
 └─────────────────────────────────────────────────────┘
 ```
 

@@ -54,11 +54,27 @@ the PyRIT MCP Server and the full [PyRIT framework](https://github.com/Azure/PyR
 | Likert Scale Scorer | Scores on a 1-5 scale instead of binary pass/fail |
 | Persuasion Scorer | Evaluates persuasion effectiveness across full conversations |
 | Insecure Code Scorer | Detects insecure code patterns in responses |
+| Prompt Shield | Uses Azure Prompt Shield for prompt injection detection (requires Azure subscription) |
+
+### Deployment
+
+- **Azure Container Apps** — Serverless cloud deployment for the SSE/HTTP server,
+  enabling shared team access without managing VMs or Kubernetes. Supports
+  auto-scaling, built-in HTTPS, and integration with Azure Entra for authentication.
+
+### CI/CD
+
+- **GitHub Actions workflow template** — Pre-built workflow that runs red-team
+  tests automatically on pull requests. Connects to the MCP server, executes a
+  configurable attack suite, and posts a summary report as a PR comment.
 
 ### Authentication
 
 - **Azure Entra (Azure AD)** — Token-based authentication for Azure-hosted models,
   eliminating the need for API key management
+- **Azure Key Vault** — Securely store and retrieve API keys, model endpoints,
+  and other secrets instead of using environment variables or `.env` files.
+  Enables enterprise secret rotation and audit logging.
 - **`.env.local` override support** — Local environment file that overrides `.env`
   without being committed to git
 
@@ -88,7 +104,6 @@ These features exist in PyRIT but are not yet scheduled for a specific release:
 | Scorer | Notes |
 |--------|-------|
 | Human-in-the-Loop | Pauses for manual review — not well-suited to MCP automation flow |
-| Prompt Shield | Uses Azure Prompt Shield for injection detection — requires Azure subscription |
 
 ### Multimodal Converters
 

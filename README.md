@@ -15,6 +15,17 @@
 
 ---
 
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| **[INSTALL.md](INSTALL.md)** | Step-by-step installation guide — Python setup, VS Code (Claude Code & GitHub Copilot), Claude Desktop, Docker |
+| **[USER_GUIDE.md](USER_GUIDE.md)** | Comprehensive user guide — all 42 tools by domain, example prompts, workflows, and testing recommendations |
+| [CHANGELOG.md](CHANGELOG.md) | Release history and change log |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
+
+---
+
 ## What This Is
 
 An [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that exposes
@@ -35,17 +46,7 @@ all through a clean tool interface.
 - Chain prompt converters (Base64, ROT13, leetspeak, language translation, etc.)
 - Generate structured vulnerability reports with Claude's reasoning
 - Run everything fully offline with local LLMs — zero API cost, zero data leakage
-
----
-
-## Documentation
-
-| Document | Description |
-|----------|-------------|
-| [INSTALL.md](INSTALL.md) | Step-by-step installation guide — Python setup, VS Code (Claude Code & GitHub Copilot), Claude Desktop, Docker |
-| [USER_GUIDE.md](USER_GUIDE.md) | Comprehensive user guide — all 42 tools by domain, example prompts, workflows, and testing recommendations |
-| [CHANGELOG.md](CHANGELOG.md) | Release history and change log |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
+- Try tools safely without real backends using **Sandbox Mode** (see [USER_GUIDE.md](USER_GUIDE.md#sandbox-mode))
 
 ---
 
@@ -65,6 +66,10 @@ offline operation.
 ---
 
 ## Quick Start
+
+> **New here?** See [INSTALL.md](INSTALL.md) for detailed setup instructions covering
+> Python environments, VS Code extensions (Claude Code & GitHub Copilot), Claude Desktop,
+> and Docker — with platform-specific guidance for Windows, macOS, and Linux.
 
 ### Prerequisites
 
@@ -302,6 +307,9 @@ They persist across container rebuilds and `docker compose down` cycles.
 ---
 
 ## Available Tools
+
+> For detailed documentation on every tool — parameters, example Claude prompts, tips,
+> and end-to-end workflows — see the **[User Guide](USER_GUIDE.md)**.
 
 ### Domain 1 — Target Management
 `pyrit_configure_http_target` · `pyrit_configure_openai_target` · `pyrit_configure_azure_target`
